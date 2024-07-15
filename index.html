@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasks of the sixth day</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js" crossorigin></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input[type="text"] {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      background: #eee;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .edit-button {
+      background-color: #28a745;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .edit-button:hover {
+      background-color: #218838;
+    }
+    .cancel-button {
+      background-color: #dc3545;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .cancel-button:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <div id="root" class="container"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const App = () => {
+      const [todos, setTodos] = useState([]);
+      const [newTodo, setNewTodo] = useState('');
+      const [errorMessage, setErrorMessage] = useState('');
+      const [isEditing, setIsEditing] = useState(false);
+      const [currentIndex, setCurrentIndex] = useState(null);
+
+      const handleAddTodo = (event) => {
+        event.preventDefault();
+        if (newTodo.trim() === '') {
+          setErrorMessage('Task name cannot be empty');
+          return;
+        }
+        if (todos.some((todo, index) => index !== currentIndex && todo.toLowerCase() === newTodo.toLowerCase())) {
+          setErrorMessage('Task with the same name already exists');
+          return;
+        }
+
+        if (isEditing) {
+          const updatedTodos = todos.map((todo, index) =>
+            index === currentIndex ? newTodo : todo
+          );
+          setTodos(updatedTodos);
+          setIsEditing(false);
+          setCurrentIndex(null);
+        } else {
+          setTodos([...todos, newTodo]);
+        }
+
+        setNewTodo('');
+        setErrorMessage('');
+      };
+
+      const handleDeleteTodo = (index) => {
+        const newTodos = todos.filter((_, i) => i !== index);
+        setTodos(newTodos);
+      };
+
+      const handleEditTodo = (index) => {
+        setIsEditing(true);
+        setCurrentIndex(index);
+        setNewTodo(todos[index]);
+      };
+
+      return (
+        <div>
+          <h1>Sixth day tasks</h1>
+          <form onSubmit={handleAddTodo}>
+            <input
+              type="text"
+              value={newTodo}
+              onChange={(e) => setNewTodo(e.target.value)}
+              placeholder="Enter the task"
+            />
+            <button type="submit">{isEditing ? 'Update' : 'Add'}</button>
+          </form>
+          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+          <ul>
+            {todos.map((todo, index) => (
+              <li key={index}>
+                {todo}
+                <div>
+                  <button className="edit-button" onClick={() => handleEditTodo(index)}>Edit</button>
+                  <button className="cancel-button" onClick={() => handleDeleteTodo(index)}>Cancel</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
